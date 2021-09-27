@@ -3,6 +3,7 @@ package com.spaz.backend.controller;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public class UsuarioControlador {
 	@PostMapping("token")
 	public Usuario logeo(@RequestParam("usuario") String username, @RequestParam("password") String password) {
 		
-		String token = getJWTToken(username);
+		String token = getJWTToken(username, password);
 		Usuario user = new Usuario();
 		user.setUsuario(username);
 		user.setPassword(password);
@@ -45,26 +46,33 @@ public class UsuarioControlador {
 		
 	}
 
-	private String getJWTToken(String username) {
-		//aqui autenticacion de bd
-		String secretKey = "mySecretKey";
-		List<GrantedAuthority> grantedAuthorities = AuthorityUtils
-				.commaSeparatedStringToAuthorityList("ROLE_USER");
+	private String getJWTToken(String usuario, String password) {
 		
-		String token = Jwts
-				.builder()
-				.setId("softtekJWT")
-				.setSubject(username)
-				.claim("authorities",
-						grantedAuthorities.stream()
-								.map(GrantedAuthority::getAuthority)
-								.collect(Collectors.toList()))
-				.setIssuedAt(new Date(System.currentTimeMillis()))
-				.setExpiration(new Date(System.currentTimeMillis() + 600000))
-				.signWith(SignatureAlgorithm.HS512,
-						secretKey.getBytes()).compact();
-
-		return "Bearer " + token;
+		if (usuarioService.validarUsuario(usuario, password))
+		{
+			String secretKey = "mySecretKey";
+			List<GrantedAuthority> grantedAuthorities = AuthorityUtils
+					.commaSeparatedStringToAuthorityList("ROLE_USER");
+			
+			String token = Jwts
+					.builder()
+					.setId("softtekJWT")
+					.setSubject(usuario)
+					.claim("authorities",
+							grantedAuthorities.stream()
+									.map(GrantedAuthority::getAuthority)
+									.collect(Collectors.toList()))
+					.setIssuedAt(new Date(System.currentTimeMillis()))
+					.setExpiration(new Date(System.currentTimeMillis() + 600000))
+					.signWith(SignatureAlgorithm.HS512,
+							secretKey.getBytes()).compact();
+	
+			return "Bearer " + token;
+		}
+		else
+		{
+			return "Validación incorrecta";
+		}
 	}
 	
 	@GetMapping( path="/usuarios",	

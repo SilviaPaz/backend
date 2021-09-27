@@ -1,5 +1,7 @@
 package com.spaz.backend.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,5 +43,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 			
             singleSubscriber.onSuccess(usuarioResponse);
             });
+	}
+	
+	@Override
+	public boolean validarUsuario(String usuario, String password)
+	{
+		Usuario usuari = usuarioRepositorio.findByUsuarioAndPassword(usuario,password);
+		return usuari!=null ? true:false;
 	}
 }

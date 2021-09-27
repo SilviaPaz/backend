@@ -10,4 +10,6 @@ import com.spaz.backend.entity.Usuario;
 @Repository
 public interface UsuarioRepositorio extends JpaRepository<Usuario, Long> {
     List<Usuario> findAllById(Long id);
+    
+    Usuario findByUsuarioAndPassword(String usuario, String password);
 }

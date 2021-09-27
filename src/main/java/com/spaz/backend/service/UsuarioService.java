@@ -10,4 +10,6 @@ public interface UsuarioService {
 	Single<UsuarioResponse> getUsuario(Long idUsuario);
 	
 	Single<UsuarioResponse> createUsuario(UsuarioRequest usuarioRequest);
+	
+	boolean validarUsuario(String usuario, String password);
 }
